@@ -12,12 +12,21 @@ namespace FLS_Accord
         public List<SubjectInput> Subjects = new List<SubjectInput>();
         public List<LecturerInput> Lecturers = new List<LecturerInput>();
         public List<SubjectRegister> SubjectRegisters = new List<SubjectRegister>();
-        public  GenerateTimetableInput(List<CourseInput> courses, List<SubjectInput> subjects, List<LecturerInput> lecturers, List<SubjectRegister> subjectRegisters)
+
+
+        public int TimetableType { get; set; }
+
+        public GenerateTimetableInput()
+        {
+        }
+
+        public GenerateTimetableInput(List<CourseInput> courses, List<SubjectInput> subjects, List<LecturerInput> lecturers, List<SubjectRegister> subjectRegisters, int timetableType)
         {
             Courses = courses;
             Subjects = subjects;
             Lecturers = lecturers;
             SubjectRegisters = subjectRegisters;
+            TimetableType = timetableType;
         }
     }
 
@@ -73,5 +82,8 @@ namespace FLS_Accord
         public virtual List<SubjectRegister> SubjectRegister { get; set; }
         public virtual List<TeachableSubject> TeachableSubject { get; set; }
         public List<Course> OccupiedCourse { get; set; }
+
+
+
     }
 }
