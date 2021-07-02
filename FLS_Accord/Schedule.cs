@@ -6,7 +6,7 @@ using System.Text;
 namespace FLS_Accord
 {
 
-    public class GenerateTimetableInput
+    public class GenerateTimetableInput : IDisposable
     {
         public List<CourseInput> Courses = new List<CourseInput>();
         public List<SubjectInput> Subjects = new List<SubjectInput>();
@@ -29,15 +29,23 @@ namespace FLS_Accord
             TeachableSubjectInputs = teachableSubjectInputs;
             TimetableType = timetableType;
         }
+
+        public void Dispose()
+        {
+            GC.SuppressFinalize(this);
+        }
     }
 
     class Schedule
     {
         private string lecturerCode;
-        private int subjectCode;
+        private string subjectCode;
+        private string course;
 
         public string LecturerCode { get => lecturerCode; set => lecturerCode = value; }
-        public int SubjectCode { get => subjectCode; set => subjectCode = value; }
+        public string SubjectCode { get => subjectCode; set => subjectCode = value; }
+
+        public string Course { get => course; set => course = value; }
     }
 
     public class SubjectInput
@@ -76,6 +84,7 @@ namespace FLS_Accord
         public int PriorityPoint { get; set; }
         public int DepartmentId { get; set; }
         public string LecturerCode { get; set; }
+
 
         public virtual Department Department { get; set; }
         public virtual LecturerType LecturerType { get; set; }

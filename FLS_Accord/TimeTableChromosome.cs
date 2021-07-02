@@ -93,10 +93,11 @@ namespace FLS_Accord
             }
         }
 
-        class TimeTableChromosome : ChromosomeBase
+        public class TimeTableChromosome : ChromosomeBase
         {
             private readonly GenerateTimetableInput _dataContext;
             static Random Random = new Random();
+            public int globalCount = 0;
 
             //static TimeSpan RandomStartTime()
             //{
@@ -193,7 +194,7 @@ namespace FLS_Accord
 
                 foreach (var course in courseList)
                 {
-                    randomLecturer = lecturerList[random.Next(0, lecturerList.Count)];
+                    randomLecturer = lecturerList[random.Next(0, lecturerList.Count - 1)];
                     
                     LecturerCourse lecturerCourse = new LecturerCourse();
                     lecturerCourse.Lecturer = randomLecturer;
@@ -252,6 +253,8 @@ namespace FLS_Accord
                 private readonly GenerateTimetableInput _dataContext = new GenerateTimetableInput();
 
 
+                private int globalCount = 0;
+
                 public double Evaluate(IChromosome chromosome)
                 {
                     double score = 1;
@@ -270,6 +273,7 @@ namespace FLS_Accord
                     //    s    
                     //}
                     //score += CheckTotalHoursConstaint(values, timetableType);
+                    Console.WriteLine("Diem: " + globalCount++);
 
 
                     return Math.Pow(Math.Abs(score), -1);
