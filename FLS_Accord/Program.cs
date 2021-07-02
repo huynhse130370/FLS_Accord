@@ -9,8 +9,9 @@ namespace FLS_Accord
     {
         static void Main(string[] args)
         {
-            private readonly FLSContext 
+            
 
+            
             //using (var dataContext = new FLSContext())
             //{
             //    Console.WriteLine("Create population ...");
@@ -46,6 +47,33 @@ namespace FLS_Accord
             //    //dataContext.TimeSlots.AddRange(timetable);
             //    //dataContext.SaveChanges();
             //}
+        }
+        private readonly FLSContext _context;
+
+        public Program(FLSContext context)
+        {
+            _context = context;
+        }
+
+        public string AddDataToSchedule()
+        {
+            var courses = _context.Course.ToList();
+            var subjects = _context.Subject.ToList();
+            var lecturers = _context.Lecturer.Include.ToList();
+            var subjectRegisters = _context.SubjectRegister.ToList();
+            var teachableSubject = _context.TeachableSubject.ToList();
+
+            foreach(var lecturer in lecturers)
+            {
+                LecturerInput lecturerInput = new LecturerInput
+                {
+                    Id = lecturer.Id,
+                    Department = lecturer.Department;
+                }
+            }
+
+
+            GenerateTimetableInput generate = new GenerateTimetableInput()
         }
     }
 }
