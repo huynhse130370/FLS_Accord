@@ -11,8 +11,8 @@ namespace FLS_Accord
         public List<CourseInput> Courses = new List<CourseInput>();
         public List<SubjectInput> Subjects = new List<SubjectInput>();
         public List<LecturerInput> Lecturers = new List<LecturerInput>();
-        public List<SubjectRegister> SubjectRegisters = new List<SubjectRegister>();
-
+        public List<SubjectRegister> SubjectRegisterInputs = new List<SubjectRegister>();
+        public List<TeachableSubjectInput> TeachableSubjectInputs = new List<TeachableSubjectInput>();
 
         public int TimetableType { get; set; }
 
@@ -20,12 +20,13 @@ namespace FLS_Accord
         {
         }
 
-        public GenerateTimetableInput(List<CourseInput> courses, List<SubjectInput> subjects, List<LecturerInput> lecturers, List<SubjectRegister> subjectRegisters, int timetableType)
+        public GenerateTimetableInput(List<CourseInput> courses, List<SubjectInput> subjects, List<LecturerInput> lecturers, List<SubjectRegister> subjectRegisters, List<TeachableSubjectInput> teachableSubjectInputs, int timetableType)
         {
             Courses = courses;
             Subjects = subjects;
             Lecturers = lecturers;
-            SubjectRegisters = subjectRegisters;
+            SubjectRegisterInputs = subjectRegisters;
+            TeachableSubjectInputs = teachableSubjectInputs;
             TimetableType = timetableType;
         }
     }
@@ -61,7 +62,7 @@ namespace FLS_Accord
         public int LecturerId { get; set; }
 
         public virtual Semester Semester { get; set; }
-        public virtual Subject Subject { get; set; }
+        public virtual SubjectInput Subject { get; set; }
         public LecturerInput Lecturer { get; set; }
     }
 
@@ -81,9 +82,24 @@ namespace FLS_Accord
         public virtual List<LectureSemesterRegister> LectureSemesterRegister { get; set; }
         public virtual List<SubjectRegister> SubjectRegister { get; set; }
         public virtual List<TeachableSubject> TeachableSubject { get; set; }
-        public List<Course> OccupiedCourse { get; set; }
+        public List<CourseInput> OccupiedCourse { get; set; }
 
+    }
 
+    public partial class TeachableSubjectInput
+    {
+        public int LecturerId { get; set; }
+        public int SubjectId { get; set; }
+        public int PreferPoint { get; set; }
+        public int MatchPoint { get; set; }
 
+        public virtual LecturerInput Lecturer { get; set; }
+        public virtual SubjectInput Subject { get; set; }
+    }
+
+    public class LecturerCourse
+    {
+        public LecturerInput Lecturer { get; set; }
+        public CourseInput Course { get; set; }
     }
 }

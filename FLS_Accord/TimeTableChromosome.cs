@@ -104,17 +104,40 @@ namespace FLS_Accord
             //        (int)TimeSpan.FromHours(17).TotalMilliseconds));
             //}
 
-            public List<SubjectValue> Value;
+            public List<LecturerCourse> Value;
 
             public TimeTableChromosome(GenerateTimetableInput dataContext)
             {
                 _dataContext = dataContext;
                 Generate();
             }
-            public TimeTableChromosome(List<SubjectValue> subjectChromosomes, GenerateTimetableInput dataContext)
+            public TimeTableChromosome(List<LecturerCourse> subjectChromosomes, GenerateTimetableInput dataContext)
             {
                 _dataContext = dataContext;
                 Value = subjectChromosomes.ToList();
+            }
+
+
+            private List<LecturerCourse> CreateLecturerWithCourses(List<LecturerInput> lecturerList, List<CourseInput> courseList)
+            {
+
+                Random random = new Random();
+                LecturerInput randomLecturer;
+                List<LecturerCourse> listLecturerCourse = new List<LecturerCourse>();
+
+                foreach(var course in courseList)
+                {
+                    randomLecturer = lecturerList[random.Next(0, lecturerList.Count)];
+
+
+                    LecturerCourse lecturerCourse = new LecturerCourse();
+                    lecturerCourse.Lecturer = randomLecturer;
+                    lecturerCourse.Course = course;
+
+                    listLecturerCourse.Add(lecturerCourse);
+                }
+                
+                return listLecturerCourse;
             }
 
 
@@ -124,7 +147,7 @@ namespace FLS_Accord
                 LecturerInput teacherRandom;
                 Random Random = new Random();
                 bool canChoose;
-                var registers = _dataContext.SubjectRegisters;
+                var registers = _dataContext.SubjectRegisterInputs;
                 if (Lecturers.Count != 0)
                 {
                     do
@@ -158,36 +181,28 @@ namespace FLS_Accord
 
             public override void Generate()
             {
-                IEnumerable<SubjectValue> generateRandomLecturer()
+                Random random = new Random();
+
+                var courseList = _dataContext.Courses;
+
+                var lecturerList = _dataContext.Lecturers;
+
+
+                LecturerInput randomLecturer;
+                List<LecturerCourse> listLecturerCourse = new List<LecturerCourse>();
+
+                foreach (var course in courseList)
                 {
-                    var subjects = _dataContext.Subjects;
-
-
-                    foreach (var subject in subjects)
-                    {
-                        LecturerInput lecturerRandom = RandomLecturers(_dataContext.Lecturers, subject);
-
-                        List<CourseInput> newCourse = new List<CourseInput>();
-
-                        foreach (var course in subject.Courses)
-                        {
-                            course.Lecturer = lecturerRandom;
-                            newCourse.Add(course);
-                        }
-                        if (newCourse.ElementAt(0).Lecturer != null)
-                        {
-                            yield return new SubjectValue(newCourse.ElementAt(0).Name, newCourse.ElementAt(0).Lecturer.Id, newCourse);
-
-                        }
-                        else
-                        {
-                            yield return new SubjectValue(newCourse.ElementAt(0).Name, 0, newCourse);
-                        }
-
-                    }
+                    randomLecturer = lecturerList[random.Next(0, lecturerList.Count)];
+                    
+                    LecturerCourse lecturerCourse = new LecturerCourse();
+                    lecturerCourse.Lecturer = randomLecturer;
+                    lecturerCourse.Course = course;
+                    listLecturerCourse.Add(lecturerCourse);
                 }
+                
 
-                Value = generateRandomLecturer().ToList();
+                Value = listLecturerCourse;
 
             }
 
@@ -206,89 +221,19 @@ namespace FLS_Accord
             public override void Mutate()
             {
                 Random Random = new Random();
-                LecturerInput lecturerFirst;
-                LecturerInput lecturerSecond;
-                SubjectValue subjectChoosedFirst;
-                SubjectValue subjectChoosedSecond;
-                int indexFirst;
-                int indexSecond;
-                bool canChoose;
-                var count = 0;
-                var registers = _dataContext.SubjectRegisters;
+                
+                int index = Random.Next(0, Value.Count - 1);
 
+                LecturerCourse indexLecturerCourse = Value[index];
+
+                var listLecturer = _dataContext.Lecturers;
+                LecturerInput lecturer;
                 do
                 {
-                    canChoose = true;
-                    var randomCount = 0;
-                    do
-                    {
-                        do
-                        {
-                            indexFirst = Random.Next(0, Value.Count - 1);
-                            indexSecond = Random.Next(0, Value.Count - 1);
-                        }
-                        while (indexSecond == indexFirst);
+                    lecturer = listLecturer[Random.Next(0, listLecturer.Count - 1)];
+                } while (lecturer.Equals(indexLecturerCourse.Lecturer));
 
-                        subjectChoosedFirst = Value.ElementAt(indexFirst);
-                        subjectChoosedSecond = Value.ElementAt(indexSecond);
-
-                        lecturerFirst = subjectChoosedFirst.Courses.ElementAt(0).Lecturer;
-                        lecturerSecond = subjectChoosedSecond.Courses.ElementAt(0).Lecturer;
-                        if (lecturerFirst == null || lecturerSecond == null)
-                        {
-                            break;
-                        }
-                        randomCount++;
-                    } while (lecturerFirst.Equals(lecturerSecond) && randomCount <= Value.Count);
-                    if (lecturerFirst != null && lecturerSecond != null)
-                    {
-                        foreach (var course in lecturerFirst.OccupiedCourse)
-                        {
-                            foreach (var currentCourse in subjectChoosedFirst.Courses)
-                            {
-                                foreach (var registerCourse in registers)
-                                {
-                                    if (lecturerFirst.Id == registerCourse.LecturerId && currentCourse.SubjectId != registerCourse.SubjectId)
-                                    {
-                                        canChoose = false;
-                                        count++;
-                                    }
-                                }
-
-                            }
-
-                        }
-                        foreach (var course in lecturerFirst.OccupiedCourse)
-                        {
-                            foreach (var currentCourse in subjectChoosedSecond.Courses)
-                            {
-                                foreach (var registerCourse in registers)
-                                {
-                                    if (lecturerFirst.Id == registerCourse.LecturerId && currentCourse.SubjectId != registerCourse.SubjectId)
-                                    {
-                                        canChoose = false;
-                                        count++;
-                                    }
-                                }
-
-                            }
-
-                        }
-                    }
-                } while (!canChoose && count <= 100);
-
-                foreach (var session in subjectChoosedFirst.Courses)
-                {
-                    session.Lecturer = lecturerSecond;
-                }
-
-                foreach (var session in subjectChoosedSecond.Courses)
-                {
-                    session.Lecturer = lecturerFirst;
-                }
-
-                Value[indexFirst] = subjectChoosedFirst;
-                Value[indexSecond] = subjectChoosedSecond;
+                Value[index].Lecturer = lecturer;
             }
 
             public override void Crossover(IChromosome pair)
@@ -303,15 +248,26 @@ namespace FLS_Accord
 
             public class FitnessFunction : IFitnessFunction
             {
+
+                private readonly GenerateTimetableInput _dataContext = new GenerateTimetableInput();
+
+
                 public double Evaluate(IChromosome chromosome)
                 {
                     double score = 1;
-                    //var values = (chromosome as TimeTableChromosome).Value;
+                    FitNessCalculation fit = new FitNessCalculation();
+
+                var values = (chromosome as TimeTableChromosome).Value;
                     //var timetableType = (chromosome as TimeTableChromosome)._dataContext.TimetableType;
+                    score += fit.calMinMaxCouseOfLecturer(_dataContext.Lecturers, values);
+                    score += fit.checkLecturerTeachableSubject(values, _dataContext);
+                    score += fit.checkNotRegister(values, _dataContext);
                     //foreach (var value in values)
                     //{
                     //    //var overLaps = CheckOverLapConstaint(value, values);
                     //    //score += CheckOverLapConstaint(value, values);
+
+                    //    s    
                     //}
                     //score += CheckTotalHoursConstaint(values, timetableType);
 
@@ -319,29 +275,27 @@ namespace FLS_Accord
                     return Math.Pow(Math.Abs(score), -1);
                 }
 
-                private bool isBetweenMinMaxCourse(LecturerInput lecturer)
-                {
-                    List<CourseInput> Courses = new List<CourseInput>();
-                    var count = 0;
-                    foreach (var course in Courses)
-                    {
-                        if (lecturer.Id == course.Lecturer.Id)
-                        {
-                            count++;
-                        }
-                    }
-                    if (count > lecturer.MinCourse && count < lecturer.MaxCourse)
-                    {
-                        return true;
-                    }
-                    return false;
-                }
+                //private bool isBetweenMinMaxCourse(LecturerInput lecturer, List<CourseInput> Courses)
+                //{
+                //    var count = 0;
+                //    foreach (var course in Courses)
+                //    {
+                //        if (lecturer.Id == course.Lecturer.Id)
+                //        {
+                //            count++;
+                //        }
+                //    }
+                //    if (count > lecturer.MinCourse && count < lecturer.MaxCourse)
+                //    {
+                //        return true;
+                //    }
+                //    return false;
+                //}
 
-                private bool isFitSubject(LecturerInput lecturer, List<LecturerInput> lecturers)
-                {
-
-                    return false;
-                }
+                //private bool isFitSubject(LecturerInput lecturer, List<LecturerInput> lecturers)
+                //{
+                //    return false;
+                //}
             }
         }
     }

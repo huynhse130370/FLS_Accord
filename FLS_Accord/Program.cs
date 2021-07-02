@@ -9,7 +9,7 @@ namespace FLS_Accord
     {
         static void Main(string[] args)
         {
-
+            private readonly FLSContext 
 
             //using (var dataContext = new FLSContext())
             //{
