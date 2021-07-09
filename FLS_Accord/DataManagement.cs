@@ -1,17 +1,15 @@
 ﻿using FLS_Accord.Models;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace FLS_Accord
 {
-    class AddDataToSchedule
+    public class DataManagement
     {
         private readonly FLSContext _context;
 
-        public AddDataToSchedule(FLSContext context)
+        public DataManagement(FLSContext context)
         {
             _context = context;
         }
@@ -39,11 +37,27 @@ namespace FLS_Accord
             var teachableSubject = _context.TeachableSubject.Include(x => x.Lecturer)
                                                            .Include(x => x.Subject)
                                                            .ToList();
+
+            var timeSlots = _context.TimeSlot.ToList();
+
+
+            var studentGroups = _context.StudentGroup.ToList();
+
             var courseInputList = new List<CourseInput>();
+
             var subjectInputList = new List<SubjectInput>();
+
             var lecturerInputList = new List<LecturerInput>();
-            var subjectRegisterInputList = new List<SubjectRegister>();
+
+            var subjectRegisterInputList = new List<SubjectRegisterInput>();
+
             var teachableSubjectInputList = new List<TeachableSubjectInput>();
+
+            var studentGroupInputList = new List<StudentGroupInput>();
+
+            var timeSlotList = new List<TimeSlotInput>();
+
+
             foreach (var lecturer in lecturers)
             {
                 LecturerInput lecturerInput = new LecturerInput
@@ -97,7 +111,44 @@ namespace FLS_Accord
                 teachableSubjectInputList.Add(teachableinput);
             }
 
-            GenerateTimetableInput generate = new GenerateTimetableInput(courseInputList, subjectInputList, lecturerInputList, subjectRegisters, teachableSubjectInputList, 1);
+            foreach(var subjectRegister in subjectRegisters)
+            {
+                SubjectRegisterInput subjectRegisterInput = new SubjectRegisterInput
+                {
+                    Id = subjectRegister.Id,
+                    LecturerId = subjectRegister.LecturerId,
+                    SemesterPlanId = subjectRegister.SemesterPlanId,
+                    SubjectId = subjectRegister.SubjectId,
+                    Lecturer = lecturerInputList.SingleOrDefault(x => x.Id == subjectRegister.LecturerId),
+                    Subject = subjectInputList.SingleOrDefault(x => x.Name.Equals(subjectRegister.Subject.Name)),
+                };
+                subjectRegisterInputList.Add(subjectRegisterInput);
+            }
+
+            foreach(var timeSlot in timeSlots)
+            {
+                TimeSlotInput timeSlotInput = new TimeSlotInput
+                {
+                    Id = timeSlot.Id,
+                    Name = timeSlot.Name,
+                    StartTime = timeSlot.StartTime,
+                    EndTime = timeSlot.EndTime,
+                    DayOfWeek = timeSlot.DayOfWeek,
+                };
+                timeSlotList.Add(timeSlotInput);
+            }
+
+            foreach (var studentGroup in studentGroups)
+            {
+                StudentGroupInput studentGroupInput = new StudentGroupInput
+                {
+                    Id = studentGroup.Id,
+                    Name = studentGroup.Name,
+                };
+                studentGroupInputList.Add(studentGroupInput);
+            }
+
+            GenerateTimetableInput generate = new GenerateTimetableInput(courseInputList, subjectInputList, lecturerInputList, timeSlotList, subjectRegisterInputList, teachableSubjectInputList, studentGroupInputList);
             return generate;
         }
     }

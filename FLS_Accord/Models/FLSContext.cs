@@ -22,6 +22,7 @@ namespace FLS_Accord.Models
         public virtual DbSet<Blog> Blog { get; set; }
         public virtual DbSet<BlogCategory> BlogCategory { get; set; }
         public virtual DbSet<Course> Course { get; set; }
+        public virtual DbSet<CourseSlot> CourseSlot { get; set; }
         public virtual DbSet<Department> Department { get; set; }
         public virtual DbSet<DepartmentBlog> DepartmentBlog { get; set; }
         public virtual DbSet<LectureSemesterRegister> LectureSemesterRegister { get; set; }
@@ -32,6 +33,7 @@ namespace FLS_Accord.Models
         public virtual DbSet<Role> Role { get; set; }
         public virtual DbSet<Semester> Semester { get; set; }
         public virtual DbSet<SemesterPlan> SemesterPlan { get; set; }
+        public virtual DbSet<StudentGroup> StudentGroup { get; set; }
         public virtual DbSet<Subject> Subject { get; set; }
         public virtual DbSet<SubjectRegister> SubjectRegister { get; set; }
         public virtual DbSet<TeachableSubject> TeachableSubject { get; set; }
@@ -44,7 +46,7 @@ namespace FLS_Accord.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=tcp:flscheduler.database.windows.net,1433;Initial Catalog=FLS;Persist Security Info=False;User ID=minhnt;Password=.yazw-EY!5hN9HS;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;");
+                optionsBuilder.UseSqlServer("Data Source=flscheduler.database.windows.net,1433;Initial Catalog=FLS;Persist Security Info=False;User ID=minhnt;Password=.yazw-EY!5hN9HS;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;");
             }
         }
 
@@ -94,6 +96,11 @@ namespace FLS_Accord.Models
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Course_Semester");
 
+                entity.HasOne(d => d.StudentGroup)
+                    .WithMany(p => p.Course)
+                    .HasForeignKey(d => d.StudentGroupId)
+                    .HasConstraintName("FK_Course_StudentGroup");
+
                 entity.HasOne(d => d.Subject)
                     .WithMany(p => p.Course)
                     .HasForeignKey(d => d.SubjectId)
@@ -101,11 +108,32 @@ namespace FLS_Accord.Models
                     .HasConstraintName("FK_Course_Subject1");
             });
 
+            modelBuilder.Entity<CourseSlot>(entity =>
+            {
+                entity.HasOne(d => d.Course)
+                    .WithMany(p => p.CourseSlot)
+                    .HasForeignKey(d => d.CourseId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_CourseSlot_Course");
+
+                entity.HasOne(d => d.TimeSlot)
+                    .WithMany(p => p.CourseSlot)
+                    .HasForeignKey(d => d.TimeSlotId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_CourseSlot_TimeSlot");
+            });
+
             modelBuilder.Entity<Department>(entity =>
             {
                 entity.Property(e => e.Description).HasMaxLength(100);
 
                 entity.Property(e => e.Name).HasMaxLength(50);
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.Department)
+                    .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Department_User");
             });
 
             modelBuilder.Entity<DepartmentBlog>(entity =>
@@ -262,21 +290,28 @@ namespace FLS_Accord.Models
                     .HasConstraintName("FK_SemesterPlan_Semester");
             });
 
+            modelBuilder.Entity<StudentGroup>(entity =>
+            {
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(50);
+            });
+
             modelBuilder.Entity<Subject>(entity =>
             {
                 entity.HasIndex(e => e.DepartmentId);
 
                 entity.Property(e => e.Name)
                     .IsRequired()
-                    .HasMaxLength(50);
+                    .HasMaxLength(150);
 
                 entity.Property(e => e.PreviousCode)
-                    .HasMaxLength(6)
+                    .HasMaxLength(7)
                     .IsUnicode(false);
 
                 entity.Property(e => e.SubjectCode)
                     .IsRequired()
-                    .HasMaxLength(6)
+                    .HasMaxLength(7)
                     .IsUnicode(false);
 
                 entity.HasOne(d => d.Department)
@@ -396,12 +431,6 @@ namespace FLS_Accord.Models
                     .IsRequired()
                     .HasMaxLength(100);
 
-                entity.Property(e => e.Gender)
-                    .IsRequired()
-                    .HasMaxLength(1)
-                    .IsUnicode(false)
-                    .IsFixedLength();
-
                 entity.Property(e => e.Password)
                     .IsRequired()
                     .HasMaxLength(64)
@@ -409,7 +438,7 @@ namespace FLS_Accord.Models
 
                 entity.Property(e => e.PhoneNumber)
                     .IsRequired()
-                    .HasMaxLength(12)
+                    .HasMaxLength(15)
                     .IsUnicode(false);
 
                 entity.Property(e => e.Username)

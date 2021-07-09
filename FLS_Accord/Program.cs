@@ -14,7 +14,7 @@ namespace FLS_Accord
         {
             FLSContext context = new FLSContext();
 
-            AddDataToSchedule model = new AddDataToSchedule(context);
+            DataManagement model = new DataManagement(context);
 
             GenerateTimetableInput dataContext = model
                 .AddDataToContext();
@@ -47,8 +47,7 @@ namespace FLS_Accord
                 Console.WriteLine("LecturerCode : Course");
                 foreach (var x in timetable)
                 {
-                    Console.WriteLine("Lecturer: "+x.Lecturer.LecturerCode);
-                    //Console.WriteLine(x.Course.Subject.Name);
+                    Console.WriteLine("Lecturer: " + x.Lecturer.LecturerCode);
                     Console.WriteLine("Course: " + x.Course.Id);
 
                 }
@@ -73,8 +72,9 @@ namespace FLS_Accord
 
                 //dataContext.TimeSlots.AddRange(timetable);
                 //dataContext.SaveChanges();
+
             }
         }
-        
+
     }
 }

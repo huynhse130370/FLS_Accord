@@ -19,7 +19,9 @@ namespace FLS_Accord.Models
         public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
+        public int UserId { get; set; }
 
+        public virtual User User { get; set; }
         public virtual ICollection<DepartmentBlog> DepartmentBlog { get; set; }
         public virtual ICollection<Lecturer> Lecturer { get; set; }
         public virtual ICollection<Subject> Subject { get; set; }

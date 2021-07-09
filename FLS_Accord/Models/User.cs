@@ -11,6 +11,7 @@ namespace FLS_Accord.Models
     {
         public User()
         {
+            Department = new HashSet<Department>();
             Lecturer = new HashSet<Lecturer>();
         }
 
@@ -22,12 +23,13 @@ namespace FLS_Accord.Models
         public string Address { get; set; }
         public DateTime Birthdate { get; set; }
         public string PhoneNumber { get; set; }
-        public string Gender { get; set; }
+        public bool IsFemale { get; set; }
         public string CreateBy { get; set; }
         public string AvatarLink { get; set; }
         public int RoleId { get; set; }
 
         public virtual Role Role { get; set; }
+        public virtual ICollection<Department> Department { get; set; }
         public virtual ICollection<Lecturer> Lecturer { get; set; }
     }
 }

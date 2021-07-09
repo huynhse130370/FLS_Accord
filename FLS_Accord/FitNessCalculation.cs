@@ -11,7 +11,7 @@ namespace FLS_Accord
 
         }
 
-        public int calMinMaxCouseOfLecturer(List<LecturerInput> lecturerInputs, List<LecturerCourse> listLecturerCourse)
+        public int calMinMaxCouseOfLecturer(List<LecturerInput> lecturerInputs, List<LecturerCourseSlot> listLecturerCourse)
         {
             int conflict = 0;
             int count = 0;
@@ -33,8 +33,8 @@ namespace FLS_Accord
             return conflict;
         }
 
-        
-        public int checkLecturerTeachableSubject(List<LecturerCourse> listLecturerCourse, GenerateTimetableInput context)
+
+        public int checkLecturerTeachableSubject(List<LecturerCourseSlot> listLecturerCourse, GenerateTimetableInput context)
         {
             int conflict = 0;
 
@@ -52,23 +52,23 @@ namespace FLS_Accord
                         {
                             var isMatch = teachableLecturer.MatchPoint > 2;
                             var isPrefer = teachableLecturer.PreferPoint > 2;
-                            if(!isMatch)
+                            if (!isMatch)
                             {
                                 conflict++;
                             }
-                            if(!isPrefer)
+                            if (!isPrefer)
                             {
                                 conflict++;
                             }
                         }
-                        
+
                     }
                 }
             }
             return conflict;
         }
 
-        public int checkNotRegister(List<LecturerCourse> listLecturerCourse, GenerateTimetableInput context)
+        public int checkNotRegister(List<LecturerCourseSlot> listLecturerCourse, GenerateTimetableInput context)
         {
             int conflict = 0;
             foreach (var lecturerCourse in listLecturerCourse)

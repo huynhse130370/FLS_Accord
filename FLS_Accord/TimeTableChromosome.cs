@@ -1,17 +1,14 @@
 ﻿using Accord.Genetic;
-using FLS_Accord.Models;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace FLS_Accord
 {
 
     public class TimeTableGenerationHandler
     {
-        
+
 
         private static readonly int MAXCHROMOSOME = 50;
 
@@ -25,7 +22,7 @@ namespace FLS_Accord
 
             Population population = new Population(MAXCHROMOSOME, new TimeTableChromosome(dataContext),
                            new TimeTableChromosome.FitnessFunction(), new EliteSelection());
-            
+
             return population;
         }
 
@@ -63,7 +60,7 @@ namespace FLS_Accord
 
             IChromosome bestChromosome = population.BestChromosome;
             bestChromosome.Evaluate(new TimeTableChromosome.FitnessFunction());
-            
+
             Console.WriteLine(selectedChromosome.Fitness + "  vs  " + bestChromosome.Fitness + "= " + (selectedChromosome.Fitness.CompareTo(bestChromosome.Fitness) > 0));
 
 
@@ -97,49 +94,42 @@ namespace FLS_Accord
         {
             private readonly GenerateTimetableInput _dataContext;
             static Random Random = new Random();
-            public int globalCount = 0;
 
-            //static TimeSpan RandomStartTime()
-            //{
-            //    return TimeSpan.FromMilliseconds(Random.Next((int)TimeSpan.FromHours(7).TotalMilliseconds,
-            //        (int)TimeSpan.FromHours(17).TotalMilliseconds));
-            //}
-
-            public List<LecturerCourse> Value;
+            public List<LecturerCourseSlot> Value;
 
             public TimeTableChromosome(GenerateTimetableInput dataContext)
             {
                 _dataContext = dataContext;
                 Generate();
             }
-            public TimeTableChromosome(List<LecturerCourse> subjectChromosomes, GenerateTimetableInput dataContext)
+            public TimeTableChromosome(List<LecturerCourseSlot> subjectChromosomes, GenerateTimetableInput dataContext)
             {
                 _dataContext = dataContext;
                 Value = subjectChromosomes.ToList();
             }
 
 
-            private List<LecturerCourse> CreateLecturerWithCourses(List<LecturerInput> lecturerList, List<CourseInput> courseList)
-            {
+            //private List<LecturerCourseSlot> CreateLecturerWithCourses(List<LecturerInput> lecturerList, List<CourseInput> courseList)
+            //{
 
-                Random random = new Random();
-                LecturerInput randomLecturer;
-                List<LecturerCourse> listLecturerCourse = new List<LecturerCourse>();
+            //    Random random = new Random();
+            //    LecturerInput randomLecturer;
+            //    List<LecturerCourseSlot> listLecturerCourseSlot = new List<LecturerCourseSlot>();
 
-                foreach(var course in courseList)
-                {
-                    randomLecturer = lecturerList[random.Next(0, lecturerList.Count)];
+            //    foreach (var course in courseList)
+            //    {
+            //        randomLecturer = lecturerList[random.Next(0, lecturerList.Count)];
 
 
-                    LecturerCourse lecturerCourse = new LecturerCourse();
-                    lecturerCourse.Lecturer = randomLecturer;
-                    lecturerCourse.Course = course;
+            //        LecturerCourseSlot lecturerCourse = new LecturerCourseSlot();
+            //        lecturerCourse.Lecturer = randomLecturer;
+            //        lecturerCourse.Course = course;
 
-                    listLecturerCourse.Add(lecturerCourse);
-                }
-                
-                return listLecturerCourse;
-            }
+            //        listLecturerCourseSlot.Add(lecturerCourse);
+            //    }
+
+            //    return listLecturerCourseSlot;
+            //}
 
 
             private LecturerInput RandomLecturers(List<LecturerInput> Lecturers, SubjectInput subjectValue)
@@ -186,24 +176,71 @@ namespace FLS_Accord
 
                 var courseList = _dataContext.Courses;
 
-                var lecturerList = _dataContext.Lecturers;
+                var lecturerList = _dataContext.SubjectRegisterInputs;
 
 
                 LecturerInput randomLecturer;
-                List<LecturerCourse> listLecturerCourse = new List<LecturerCourse>();
+                List<LecturerCourseSlot> listLecturerCourseSlot = new List<LecturerCourseSlot>();
 
                 foreach (var course in courseList)
                 {
-                    randomLecturer = lecturerList[random.Next(0, lecturerList.Count - 1)];
-                    
-                    LecturerCourse lecturerCourse = new LecturerCourse();
-                    lecturerCourse.Lecturer = randomLecturer;
-                    lecturerCourse.Course = course;
-                    listLecturerCourse.Add(lecturerCourse);
-                }
-                
+                    //randomLecturer = lecturerList[random.Next(0, lecturerList.Count - 1)];
 
-                Value = listLecturerCourse;
+                    var subjectInCourse = course.Subject.Name;
+
+                    List<LecturerInput> lecturerRegisterSubjectList = new List<LecturerInput>();
+
+                    foreach (var lecturer in lecturerList)
+                    {
+                        if (lecturer.Subject.Name.Equals(subjectInCourse))
+                        {
+                            lecturerRegisterSubjectList.Add(lecturer.Lecturer);
+                        }
+                    }
+
+                    List<LecturerInput> randomLecturerList = new List<LecturerInput>();
+
+                    int randomLenght = random.Next(1, lecturerRegisterSubjectList.Count);
+
+                    for (int i = 0; i <= randomLenght; i++)
+                    {
+                        //int randomIndex = random.Next(0, randomLenght - 1);
+                        randomLecturerList.Add(lecturerRegisterSubjectList[i]);
+                    }
+
+                    List<TimeSlotInput> timeSlotInputList = _dataContext.TimeSlots;
+
+                    int index1;
+                    int index2;
+                    int index3;
+
+                    do
+                    {
+                        index1 = random.Next(1, 30);
+                        index2 = random.Next(1, 30);
+                        index3 = random.Next(1, 30);
+                    } while (index1 != index2 && index2 != index3 && index3 != index1);
+
+                    List<TimeSlotInput> randomTimeSlotList = new List<TimeSlotInput>();
+
+                    TimeSlotInput timeSlotInput1 = timeSlotInputList[index1];
+                    TimeSlotInput timeSlotInput2 = timeSlotInputList[index2];
+                    TimeSlotInput timeSlotInput3 = timeSlotInputList[index3];
+
+                    randomTimeSlotList.Add(timeSlotInput1);
+                    randomTimeSlotList.Add(timeSlotInput2);
+                    randomTimeSlotList.Add(timeSlotInput3);
+
+                    LecturerCourseSlot lecturerCourseSlot = new LecturerCourseSlot();
+                    lecturerCourseSlot.Lecturers = randomLecturerList;
+                    lecturerCourseSlot.Course = course;
+                    lecturerCourseSlot.TimeSlots = randomTimeSlotList;
+
+                    listLecturerCourseSlot.Add(lecturerCourseSlot);
+                }
+
+
+                Value = listLecturerCourseSlot;
 
             }
 
@@ -222,17 +259,18 @@ namespace FLS_Accord
             public override void Mutate()
             {
                 Random Random = new Random();
-                
+
                 int index = Random.Next(0, Value.Count - 1);
 
-                LecturerCourse indexLecturerCourse = Value[index];
+                LecturerCourseSlot indexLecturerCourseSlot = Value[index];
 
                 var listLecturer = _dataContext.Lecturers;
                 LecturerInput lecturer;
                 do
                 {
                     lecturer = listLecturer[Random.Next(0, listLecturer.Count - 1)];
-                } while (lecturer.Equals(indexLecturerCourse.Lecturer));
+                    
+                } while (lecturer.Equals(indexLecturerCourseSlot.Lecturers.));
 
                 Value[index].Lecturer = lecturer;
             }
@@ -260,49 +298,19 @@ namespace FLS_Accord
                     double score = 1;
                     FitNessCalculation fit = new FitNessCalculation();
 
-                var values = (chromosome as TimeTableChromosome).Value;
+                    var values = (chromosome as TimeTableChromosome).Value;
                     //var timetableType = (chromosome as TimeTableChromosome)._dataContext.TimetableType;
+
+
                     score += fit.calMinMaxCouseOfLecturer(_dataContext.Lecturers, values);
                     score += fit.checkLecturerTeachableSubject(values, _dataContext);
                     score += fit.checkNotRegister(values, _dataContext);
-                    //foreach (var value in values)
-                    //{
-                    //    //var overLaps = CheckOverLapConstaint(value, values);
-                    //    //score += CheckOverLapConstaint(value, values);
-
-                    //    s    
-                    //}
-                    //score += CheckTotalHoursConstaint(values, timetableType);
-                    Console.WriteLine("Diem: " + globalCount++);
-
 
                     return Math.Pow(Math.Abs(score), -1);
                 }
-
-                //private bool isBetweenMinMaxCourse(LecturerInput lecturer, List<CourseInput> Courses)
-                //{
-                //    var count = 0;
-                //    foreach (var course in Courses)
-                //    {
-                //        if (lecturer.Id == course.Lecturer.Id)
-                //        {
-                //            count++;
-                //        }
-                //    }
-                //    if (count > lecturer.MinCourse && count < lecturer.MaxCourse)
-                //    {
-                //        return true;
-                //    }
-                //    return false;
-                //}
-
-                //private bool isFitSubject(LecturerInput lecturer, List<LecturerInput> lecturers)
-                //{
-                //    return false;
-                //}
             }
         }
     }
 
-    
+
 }
