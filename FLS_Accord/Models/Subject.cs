@@ -21,6 +21,7 @@ namespace FLS_Accord.Models
         public string Name { get; set; }
         public string PreviousCode { get; set; }
         public int DepartmentId { get; set; }
+        public int SlotInWeek { get; set; }
 
         public virtual Department Department { get; set; }
         public virtual ICollection<Course> Course { get; set; }

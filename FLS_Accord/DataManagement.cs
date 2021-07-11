@@ -18,6 +18,7 @@ namespace FLS_Accord
         {
             var courses = _context.Course.Include(x => x.Semester)
                                          .Include(x => x.Subject)
+                                         .Include(x => x.StudentGroup)
                                          .ToList();
 
             var subjects = _context.Subject.Include(x => x.Course)
@@ -40,8 +41,8 @@ namespace FLS_Accord
 
             var timeSlots = _context.TimeSlot.ToList();
 
-
             var studentGroups = _context.StudentGroup.ToList();
+
 
             var courseInputList = new List<CourseInput>();
 
@@ -56,6 +57,7 @@ namespace FLS_Accord
             var studentGroupInputList = new List<StudentGroupInput>();
 
             var timeSlotList = new List<TimeSlotInput>();
+
 
 
             foreach (var lecturer in lecturers)
@@ -87,6 +89,7 @@ namespace FLS_Accord
                     Semester = course.Semester,
                     SemesterId = course.SemesterId,
                     SubjectId = course.SubjectId,
+                    StudentGroup = studentGroupInputList.SingleOrDefault(x => x.Id == course.StudentGroupId)
                 };
                 courseInputList.Add(courseInput);
             }
@@ -111,7 +114,7 @@ namespace FLS_Accord
                 teachableSubjectInputList.Add(teachableinput);
             }
 
-            foreach(var subjectRegister in subjectRegisters)
+            foreach (var subjectRegister in subjectRegisters)
             {
                 SubjectRegisterInput subjectRegisterInput = new SubjectRegisterInput
                 {
@@ -125,7 +128,7 @@ namespace FLS_Accord
                 subjectRegisterInputList.Add(subjectRegisterInput);
             }
 
-            foreach(var timeSlot in timeSlots)
+            foreach (var timeSlot in timeSlots)
             {
                 TimeSlotInput timeSlotInput = new TimeSlotInput
                 {

@@ -12,68 +12,68 @@ namespace FLS_Accord
     {
         static void Main(string[] args)
         {
-            FLSContext context = new FLSContext();
+            //FLSContext context = new FLSContext();
 
-            DataManagement model = new DataManagement(context);
+            //DataManagement model = new DataManagement(context);
 
-            GenerateTimetableInput dataContext = model
-                .AddDataToContext();
+            //GenerateTimetableInput dataContext = model
+            //    .AddDataToContext();
 
-            using (dataContext)
-            {
-                Console.WriteLine("Create population ...");
-                Population population = new Population(10, new TimeTableChromosome(dataContext),
-                    new TimeTableChromosome.FitnessFunction(), new EliteSelection());
+            //using (dataContext)
+            //{
+            //    Console.WriteLine("Create population ...");
+            //    Population population = new Population(10, new TimeTableChromosome(dataContext),
+            //        new TimeTableChromosome.FitnessFunction(), new EliteSelection());
 
-                int i = 0;
+            //    int i = 0;
 
-                Console.WriteLine("Begin creating ...");
-                while (true)
-                {
-                    population.RunEpoch();
-                    i++;
-                    Console.WriteLine("Vong lap: " + i);
-                    if (population.FitnessMax >= 0.99 || i >= 20)
-                    {
-                        break;
-                    }
-                }
+            //    Console.WriteLine("Begin creating ...");
+            //    while (true)
+            //    {
+            //        population.RunEpoch();
+            //        i++;
+            //        Console.WriteLine("Vong lap: " + i);
+            //        if (population.FitnessMax >= 0.99 || i >= 20)
+            //        {
+            //            break;
+            //        }
+            //    }
 
-                Console.WriteLine("Best Chromosome: " + population.BestChromosome);
+            //    Console.WriteLine("Best Chromosome: " + population.BestChromosome);
 
-                var timetable = (population.BestChromosome as TimeTableChromosome).Value.ToList();
-
-
-                Console.WriteLine("LecturerCode : Course");
-                foreach (var x in timetable)
-                {
-                    Console.WriteLine("Lecturer: " + x.Lecturer.LecturerCode);
-                    Console.WriteLine("Course: " + x.Course.Id);
-
-                }
-
-                //IChromosome bestChromosome = population.BestChromosome;
-
-                //var put = bestChromosome.Evaluate(new TimeTableChromosome.FitnessFunction());
-
-                //Console.WriteLine();
-
-                //Console.WriteLine(selectedChromosome.Fitness + "  vs  " + bestChromosome.Fitness + "= " + (selectedChromosome.Fitness.CompareTo(bestChromosome.Fitness) > 0));
+            //    var timetable = (population.BestChromosome as TimeTableChromosome).Value.ToList();
 
 
-                //if (selectedChromosome.Fitness.CompareTo(bestChromosome.Fitness) > 0)
-                //{
-                //    Console.WriteLine("Select:" + selectedChromosome.Fitness);
-                //    return selectedChromosome;
-                //}
-                //Console.WriteLine("Select:" + bestChromosome.Fitness);
-                //return bestChromosome;
+            //    Console.WriteLine("LecturerCode : Course");
+            //    foreach (var x in timetable)
+            //    {
+            //        Console.WriteLine("Lecturer: " + x.Lecturer.LecturerCode);
+            //        Console.WriteLine("Course: " + x.Course.Id);
+
+            //    }
+
+            //    //IChromosome bestChromosome = population.BestChromosome;
+
+            //    //var put = bestChromosome.Evaluate(new TimeTableChromosome.FitnessFunction());
+
+            //    //Console.WriteLine();
+
+            //    //Console.WriteLine(selectedChromosome.Fitness + "  vs  " + bestChromosome.Fitness + "= " + (selectedChromosome.Fitness.CompareTo(bestChromosome.Fitness) > 0));
 
 
-                //dataContext.TimeSlots.AddRange(timetable);
-                //dataContext.SaveChanges();
+            //    //if (selectedChromosome.Fitness.CompareTo(bestChromosome.Fitness) > 0)
+            //    //{
+            //    //    Console.WriteLine("Select:" + selectedChromosome.Fitness);
+            //    //    return selectedChromosome;
+            //    //}
+            //    //Console.WriteLine("Select:" + bestChromosome.Fitness);
+            //    //return bestChromosome;
 
-            }
+
+            //    //dataContext.TimeSlots.AddRange(timetable);
+            //    //dataContext.SaveChanges();
+
+            //}
         }
 
     }
