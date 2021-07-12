@@ -77,11 +77,37 @@ namespace FLS_Accord
                     Status = lecturer.Status,
                     SubjectRegister = lecturer.SubjectRegister.ToList(),
                     TeachableSubject = lecturer.TeachableSubject.ToList(),
+                    OccupiedCourse = new List<CourseInput>(),
+                    OccupiedTimeSlot = new List<TimeSlotInput>()
                 };
                 lecturerInputList.Add(lecturerInput);
             }
+
+            foreach (var subject in subjects)
+            {
+                SubjectInput subjectInput = new SubjectInput
+                {
+                    Name = subject.Name,
+                    SubjectCode = subject.SubjectCode
+                };
+                subjectInputList.Add(subjectInput);
+            }
+
+            foreach (var studentGroup in studentGroups)
+            {
+                StudentGroupInput studentGroupInput = new StudentGroupInput
+                {
+                    Id = studentGroup.Id,
+                    Name = studentGroup.Name,
+                    OccupiedTimeSlot = new List<TimeSlotInput>()
+                };
+                studentGroupInputList.Add(studentGroupInput);
+            }
+
             foreach (var course in courses)
             {
+                var subject = _context.Subject.SingleOrDefault(x => x.Id == course.SubjectId);
+                var subjectinput = subjectInputList.SingleOrDefault(x => x.SubjectCode.Equals(subject.SubjectCode));
                 CourseInput courseInput = new CourseInput
                 {
                     Id = course.Id,
@@ -89,17 +115,13 @@ namespace FLS_Accord
                     Semester = course.Semester,
                     SemesterId = course.SemesterId,
                     SubjectId = course.SubjectId,
-                    StudentGroup = studentGroupInputList.SingleOrDefault(x => x.Id == course.StudentGroupId)
+                    StudentGroup = studentGroupInputList.SingleOrDefault(x => x.Id == course.StudentGroupId),
+                    Subject = subjectinput
                 };
                 courseInputList.Add(courseInput);
             }
 
-            foreach (var subject in subjects)
-            {
-                SubjectInput subjectInput = new SubjectInput(subject.Name, courseInputList.Where(x => x.SubjectId == subject.Id).ToList());
-                subjectInputList.Add(subjectInput);
-            }
-
+            
             foreach (var teachable in teachableSubject)
             {
                 TeachableSubjectInput teachableinput = new TeachableSubjectInput
@@ -114,6 +136,9 @@ namespace FLS_Accord
                 teachableSubjectInputList.Add(teachableinput);
             }
 
+            
+
+
             foreach (var subjectRegister in subjectRegisters)
             {
                 SubjectRegisterInput subjectRegisterInput = new SubjectRegisterInput
@@ -123,7 +148,7 @@ namespace FLS_Accord
                     SemesterPlanId = subjectRegister.SemesterPlanId,
                     SubjectId = subjectRegister.SubjectId,
                     Lecturer = lecturerInputList.SingleOrDefault(x => x.Id == subjectRegister.LecturerId),
-                    Subject = subjectInputList.SingleOrDefault(x => x.Name.Equals(subjectRegister.Subject.Name)),
+                    Subject = subjectInputList.SingleOrDefault(x => x.SubjectCode.Equals(subjectRegister.Subject.SubjectCode)),
                 };
                 subjectRegisterInputList.Add(subjectRegisterInput);
             }
@@ -141,15 +166,7 @@ namespace FLS_Accord
                 timeSlotList.Add(timeSlotInput);
             }
 
-            foreach (var studentGroup in studentGroups)
-            {
-                StudentGroupInput studentGroupInput = new StudentGroupInput
-                {
-                    Id = studentGroup.Id,
-                    Name = studentGroup.Name,
-                };
-                studentGroupInputList.Add(studentGroupInput);
-            }
+            
 
             GenerateTimetableInput generate = new GenerateTimetableInput(courseInputList, subjectInputList, lecturerInputList, timeSlotList, subjectRegisterInputList, teachableSubjectInputList, studentGroupInputList);
             return generate;

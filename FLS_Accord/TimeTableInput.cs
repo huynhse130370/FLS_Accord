@@ -41,14 +41,7 @@ namespace FLS_Accord
     public class SubjectInput
     {
         public string Name { get; set; }
-
-        public List<CourseInput> Courses { get; set; }
-
-        public SubjectInput(string name, List<CourseInput> courses)
-        {
-            Name = name;
-            this.Courses = courses;
-        }
+        public string SubjectCode { get; set; }
     }
 
     public class CourseInput
