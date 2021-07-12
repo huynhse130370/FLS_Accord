@@ -244,18 +244,20 @@ namespace FLS_Accord
 
                     if (lecturerRegisterSubjectList.Count != 0)
                     {
+                        randomLecturer = lecturerRegisterSubjectList.ElementAt(random.Next(0, lecturerRegisterSubjectList.Count - 1));
+                        var teachRate = random.Next(randomLecturer.MinCourse, randomLecturer.MaxCourse);
                         do
                         {
                             randomTimeSlotList = RandomTimeSlots(random, timeSlotList);
 
                             //check TimeSlot between Lecturer and Course
-
-                            randomLecturer = lecturerRegisterSubjectList.ElementAt(random.Next(0, lecturerRegisterSubjectList.Count - 1));
-                            if (randomLecturer.OccupiedCourse.Count < randomLecturer.MaxCourse)
+                           
+                            if (randomLecturer.OccupiedCourse.Count < teachRate)
                             {
 
                                 if (randomLecturer.OccupiedTimeSlot.Count != 0)
                                 {
+                                    var separate = 0;
                                     foreach (var timeSlot in randomLecturer.OccupiedTimeSlot)
                                     {
                                         foreach (var currentTimeSlot in randomTimeSlotList)
@@ -265,6 +267,17 @@ namespace FLS_Accord
                                                 canChoose = false;
                                                 count++;
                                             }
+                                            else
+                                            {
+                                                separate++;
+                                            }
+                                        }
+                                    }
+                                    if (separate == randomLecturer.OccupiedTimeSlot.Count * 3)
+                                    {
+                                        foreach (var currentTimeSlot in randomTimeSlotList)
+                                        {
+                                            randomLecturer.OccupiedTimeSlot.Add(currentTimeSlot);
                                         }
                                     }
                                 }
@@ -278,6 +291,7 @@ namespace FLS_Accord
 
                                 if (groupInCourse.OccupiedTimeSlot.Count != 0)
                                 {
+                                    var separate = 0;
                                     foreach (var timeSlot in groupInCourse.OccupiedTimeSlot)
                                     {
                                         foreach (var currentTimeSlot in randomTimeSlotList)
@@ -287,6 +301,17 @@ namespace FLS_Accord
                                                 canChoose = false;
                                                 count++;
                                             }
+                                            else
+                                            {
+                                                separate++;
+                                            }
+                                        }
+                                    }
+                                    if (separate == groupInCourse.OccupiedTimeSlot.Count * 3)
+                                    {
+                                        foreach (var currentTimeSlot in randomTimeSlotList)
+                                        {
+                                            groupInCourse.OccupiedTimeSlot.Add(currentTimeSlot);
                                         }
                                     }
                                 }
@@ -299,8 +324,6 @@ namespace FLS_Accord
                                 }
 
                             }
-
-
 
                         } while (canChoose && count <= 100);
                         randomLecturer.OccupiedCourse.Add(course);

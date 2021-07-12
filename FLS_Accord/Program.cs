@@ -30,7 +30,7 @@ namespace FLS_Accord
                 Console.WriteLine("Begin creating ...");
                 while (true)
                 {
-                    population.RunEpoch();
+                    population.RunEpoch();  
                     i++;
                     Console.WriteLine("Vong lap: " + i);
                     if (population.FitnessMax >= 0.99 || i >= 20)
