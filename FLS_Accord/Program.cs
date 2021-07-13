@@ -45,14 +45,14 @@ namespace FLS_Accord
                 var timetable = (population.BestChromosome as TimeTableChromosome).Value.ToList();
 
 
-                Console.WriteLine("LecturerCode : Course");
+                Console.WriteLine("LecturerCode : Course : Slot");
                 foreach (var x in timetable)
                 {
                     Console.WriteLine("Lecturer: " + x.Lecturer.LecturerCode);
                     Console.WriteLine("Course: " + x.Course.Name);
                     foreach (var item in x.TimeSlots)
                     {
-                        Console.Write("Slot:" + item.Id + ", ");
+                        Console.WriteLine("Slot: " + item.Name + ", " + "Day Of Week: " + item.DayOfWeek);
                     }
                 }
 
