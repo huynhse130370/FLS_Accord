@@ -75,21 +75,6 @@ namespace FLS_Accord
         }
 
 
-        public class SubjectValue
-        {
-            public String Name { get; set; }
-            public int LecturerId { get; set; }
-
-            public List<CourseInput> Courses { get; set; }
-
-            public SubjectValue(string name, int lecturerId, List<CourseInput> courses)
-            {
-                Name = name;
-                LecturerId = lecturerId;
-                Courses = courses;
-            }
-        }
-
         public class TimeTableChromosome : ChromosomeBase
         {
             private readonly GenerateTimetableInput _dataContext;
