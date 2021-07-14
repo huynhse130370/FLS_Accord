@@ -40,8 +40,16 @@ namespace FLS_Accord
 
     public class SubjectInput
     {
+        public int Id { get; set; }
         public string Name { get; set; }
         public string SubjectCode { get; set; }
+        public int DepartmentId { get; set; }
+    }
+
+    public class DepartmentInput
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
     }
 
     public class CourseInput
@@ -50,8 +58,9 @@ namespace FLS_Accord
         public string Name { get; set; }
         public int SubjectId { get; set; }
         public int SemesterId { get; set; }
+        public int StudentGroupId { get; set; }
         public int LecturerId { get; set; }
-
+        public string SubjectCode { get; set; }
         public Semester Semester { get; set; }
         public SubjectInput Subject { get; set; }
         public LecturerInput Lecturer { get; set; }
@@ -132,9 +141,10 @@ namespace FLS_Accord
 
     public class LecturerCourseSlot
     {
-        public LecturerInput Lecturer { get; set; }
-        public CourseInput Course { get; set; }
-        public List<TimeSlotInput> TimeSlots { get; set; }
-        public StudentGroupInput StudentGroupInput { get; set; }
+        public string LecturerCode { get; set; }
+        public string CourseName { get; set; }
+        public string SubjectCode { get; set; }
+        public int StudentGroupId { get; set; }
+        public TimeSlotInput TimeSlot { get; set; }
     }
 }

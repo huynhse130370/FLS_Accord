@@ -22,7 +22,10 @@ namespace FLS_Accord
                                          .ToList();
 
             var subjects = _context.Subject.Include(x => x.Course)
+                                           .Include(x => x.Department)
                                            .ToList();
+
+            var departments = _context.Department.ToList();
 
             var lecturers = _context.Lecturer.Include(x => x.Department)
                                              .Include(x => x.TeachableSubject)
@@ -43,6 +46,7 @@ namespace FLS_Accord
 
             var studentGroups = _context.StudentGroup.ToList();
 
+            var departmentInputList = new List<DepartmentInput>();
 
             var courseInputList = new List<CourseInput>();
 
@@ -58,6 +62,16 @@ namespace FLS_Accord
 
             var timeSlotList = new List<TimeSlotInput>();
 
+
+            foreach(var dept in departments)
+            {
+                DepartmentInput departmentInput = new DepartmentInput
+                {
+                    Id = dept.Id,
+                    Name = dept.Name,
+                };
+                departmentInputList.Add(departmentInput);
+            }
 
 
             foreach (var lecturer in lecturers)
@@ -87,8 +101,10 @@ namespace FLS_Accord
             {
                 SubjectInput subjectInput = new SubjectInput
                 {
+                    Id = subject.Id,
                     Name = subject.Name,
-                    SubjectCode = subject.SubjectCode
+                    SubjectCode = subject.SubjectCode,
+                    DepartmentId = subject.DepartmentId,
                 };
                 subjectInputList.Add(subjectInput);
             }
@@ -115,6 +131,7 @@ namespace FLS_Accord
                     Semester = course.Semester,
                     SemesterId = course.SemesterId,
                     SubjectId = course.SubjectId,
+                    SubjectCode = subject.SubjectCode,
                     StudentGroup = studentGroupInputList.SingleOrDefault(x => x.Id == course.StudentGroupId),
                     Subject = subjectinput
                 };

@@ -94,171 +94,73 @@ namespace FLS_Accord
             }
 
 
-            private List<TimeSlotInput> RandomTimeSlots(Random random, List<TimeSlotInput> timeSlotInputList)
+            private TimeSlotInput RandomTimeSlot(Random random, List<TimeSlotInput> timeSlotInputList)
             {
-                List<TimeSlotInput> randomTimeSlotList = new List<TimeSlotInput>();
+                int index = random.Next(0, timeSlotInputList.Count - 1);
 
-                int index1;
-                int index2;
-                int index3;
+                return timeSlotInputList[index];
+            }
 
-                do
-                {
-                    index1 = random.Next(0, 29);
-                    index2 = random.Next(0, 29);
-                    index3 = random.Next(0, 29);
+            private LecturerInput RandomLecturer(Random random, List<LecturerInput> lecturerInputList)
+            {
+                int index = random.Next(0, lecturerInputList.Count - 1);
 
-                } while (index1 == index2 && index2 == index3 && index3 == index1);
+                return lecturerInputList[index];
+            }
 
-                TimeSlotInput timeSlotInput1 = timeSlotInputList[index1];
-                TimeSlotInput timeSlotInput2 = timeSlotInputList[index2];
-                TimeSlotInput timeSlotInput3 = timeSlotInputList[index3];
-
-                randomTimeSlotList.Add(timeSlotInput1);
-                randomTimeSlotList.Add(timeSlotInput2);
-                randomTimeSlotList.Add(timeSlotInput3);
-
-                return randomTimeSlotList;
+            static TimeSpan RandomStartTime()
+            {
+                return TimeSpan.FromHours(Random.Next((int)TimeSpan.FromHours(7).TotalHours,
+                    (int)TimeSpan.FromHours(17).TotalHours));
             }
 
             public override void Generate()
             {
-                Random random = new Random();
-
-                var courseList = _dataContext.Courses;
-
-                int count = 0;
-
-                bool isExistGroup;
-
-                bool isExistLecturer;
-
-                var lecturerList = _dataContext.SubjectRegisterInputs;
-
-                var timeSlotList = _dataContext.TimeSlots;
-
-                List<TimeSlotInput> timeSlotInputList = _dataContext.TimeSlots;
-
-                LecturerInput randomLecturer = new LecturerInput();
-
-                List<TimeSlotInput> randomTimeSlotList = new List<TimeSlotInput>();
-
-                List<LecturerCourseSlot> listLecturerCourseSlot = new List<LecturerCourseSlot>();
-
-                foreach (var course in courseList)
+                IEnumerable<LecturerCourseSlot> generateRandomSlots()
                 {
-                    int conflictLecturer = 3;
+                    var courses = _dataContext.Courses;
 
-                    int conflictGroup = 3;
+                    var subjects = _dataContext.Subjects;
 
-                    var subjectInCourse = course.Subject.SubjectCode;
+                    var lecturers = _dataContext.Lecturers;
 
-                    var groupInCourse = course.StudentGroup;
+                    var timeSlots = _dataContext.TimeSlots;
 
-                    List<LecturerInput> lecturerRegisterSubjectList = new List<LecturerInput>();
-
-                    foreach (var lecturer in lecturerList)
+                    foreach (var course in courses)
                     {
-                        if (lecturer.Subject.SubjectCode.Equals(subjectInCourse))
+                        string subjectCode = course.Subject.SubjectCode;
+
+                        int departmentId = 1;
+
+                        foreach(var subject in subjects)
                         {
-                            lecturerRegisterSubjectList.Add(lecturer.Lecturer);
+                            if (subject.SubjectCode.Equals(subjectCode)){
+                                departmentId = subject.DepartmentId;
+                            }
                         }
-                    }
 
+                        var lecturerList = new List<LecturerInput>();
 
-                    if (lecturerRegisterSubjectList.Count != 0)
-                    {
-                        randomLecturer = lecturerRegisterSubjectList.ElementAt(random.Next(0, lecturerRegisterSubjectList.Count - 1));
-
-                        if (randomLecturer.OccupiedCourse.Count < randomLecturer.MaxCourse)
+                        foreach(var lec in lecturers)
                         {
-                            do
+                            if(lec.DepartmentId == departmentId)
                             {
-                                isExistGroup = false;
-
-                                isExistLecturer = false;
-
-                                randomTimeSlotList = RandomTimeSlots(random, timeSlotList);
-
-                                //check TimeSlot between Lecturer and Course
-                                if (randomLecturer.OccupiedTimeSlot.Count != 0)
-                                {
-                                    conflictLecturer = 0;
-                                    foreach (var timeSlot in randomLecturer.OccupiedTimeSlot)
-                                    {
-                                        foreach (var currentTimeSlot in randomTimeSlotList)
-                                        {
-                                            if (timeSlot.Id == currentTimeSlot.Id)
-                                            {
-                                                conflictLecturer++;
-                                            }
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    conflictLecturer = 0;
-                                }
-
-                                if (groupInCourse.OccupiedTimeSlot.Count != 0)
-                                {
-                                    conflictGroup = 0;
-                                    foreach (var timeSlot in groupInCourse.OccupiedTimeSlot)
-                                    {
-                                        foreach (var currentTimeSlot in randomTimeSlotList)
-                                        {
-                                            if (timeSlot.Id == currentTimeSlot.Id)
-                                            {
-                                                conflictGroup++;
-                                            }
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    conflictGroup = 0;
-                                }
-
-
-
-                                if (conflictLecturer == 0)
-                                {
-                                    if (conflictGroup == 0)
-                                    {
-                                        foreach (var currentTimeSlot in randomTimeSlotList)
-                                        {
-                                            randomLecturer.OccupiedTimeSlot.Add(currentTimeSlot);
-                                            groupInCourse.OccupiedTimeSlot.Add(currentTimeSlot);
-                                        }
-                                        isExistLecturer = true;
-                                        isExistGroup = true;
-                                    }
-                                }
-
-
-
-                            } while (isExistLecturer == false || isExistGroup == false);
-
-                            randomLecturer.OccupiedCourse.Add(course);
-
-                            LecturerCourseSlot lecturerCourseSlot = new LecturerCourseSlot();
-                            lecturerCourseSlot.Lecturer = randomLecturer;
-                            lecturerCourseSlot.Course = course;
-                            lecturerCourseSlot.TimeSlots = randomTimeSlotList;
-                            lecturerCourseSlot.StudentGroupInput = groupInCourse;
-                            listLecturerCourseSlot.Add(lecturerCourseSlot);
+                                lecturerList.Add(lec);
+                            }
                         }
+
+                        yield return new LecturerCourseSlot()
+                        {
+                            CourseName = course.Name,
+                            SubjectCode = course.Subject.SubjectCode,
+                            LecturerCode = RandomLecturer(Random, lecturerList).LecturerCode,
+                            TimeSlot = RandomTimeSlot(Random, timeSlots)
+                        };
                     }
-                    count++;
                 }
 
-                if (count == 625)
-                {
-                    Console.WriteLine("Ket thuc tai day !!!");
-                }
+                Value = generateRandomSlots().ToList();
 
-                Value = listLecturerCourseSlot;
-                Console.WriteLine("Ket thuc tai day !!!");
 
             }
 
@@ -276,31 +178,29 @@ namespace FLS_Accord
 
             public override void Mutate()
             {
-                Random Random = new Random();
 
                 int index = Random.Next(0, Value.Count - 1);
 
+                var timeSlotList = _dataContext.TimeSlots;
+
                 LecturerCourseSlot indexLecturerCourseSlot = Value[index];
 
-                var listLecturer = _dataContext.Lecturers;
-                LecturerInput lecturer;
-                do
-                {
-                    lecturer = listLecturer[Random.Next(0, listLecturer.Count - 1)];
+                indexLecturerCourseSlot.TimeSlot = RandomTimeSlot(Random, timeSlotList);
 
-                } while (lecturer.Equals(indexLecturerCourseSlot.Lecturer));
-
-                Value[index].Lecturer = lecturer;
+                Value[index] = indexLecturerCourseSlot;
             }
 
             public override void Crossover(IChromosome pair)
             {
                 var randomVal = Random.Next(0, Value.Count - 2);
+
                 var otherChromsome = pair as TimeTableChromosome;
+
                 for (int index = randomVal; index < otherChromsome.Value.Count; index++)
                 {
                     Value[index] = otherChromsome.Value[index];
                 }
+
             }
 
             public class FitnessFunction : IFitnessFunction
@@ -312,14 +212,24 @@ namespace FLS_Accord
                 public double Evaluate(IChromosome chromosome)
                 {
                     double score = 1;
+
                     FitNessCalculation fit = new FitNessCalculation();
 
                     var values = (chromosome as TimeTableChromosome).Value;
 
+                    var GetoverLaps = new Func<LecturerCourseSlot, List<LecturerCourseSlot>>(current => values
+                    .Except(new[] { current })
+                    .Where(slot => slot.TimeSlot.Id == current.TimeSlot.Id)
+                    .ToList());
 
-                    score += fit.calMinMaxCouseOfLecturer(_dataContext.Lecturers, values);
-                    score += fit.checkLecturerTeachableSubject(values, _dataContext);
-                    score += fit.checkNotRegister(values, _dataContext);
+                    foreach (var value in values)
+                    {
+                        var overLaps = GetoverLaps(value);
+                        score -= overLaps.GroupBy(slot => slot.LecturerCode).Sum(x => x.Count() - 1);
+                        score -= overLaps.GroupBy(slot => slot.SubjectCode).Sum(x => x.Count() - 1);
+                    }
+
+                    score -= values.GroupBy(v => v.TimeSlot.DayOfWeek).Count() * 0.5;
 
                     return Math.Pow(Math.Abs(score), -1);
                 }
